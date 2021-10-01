@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{% block body %}
+    <div class="container-fluid with-margin">
+        <div class="col-xs-12 col-sm-10 offset-sm-1 col-md-8 offset-md-2">
+            <h1 class="text-center with-button">
+                {{ headline }}
+                <span class="btn-group" role="group">
+                    <a class="btn btn-default" href="javascript:history.back()" role="button">
+                        <i class="fas fa-arrow-left"></i>
+                        Zurück
+                    </a>
+                    {% if ajaxButton is defined and ajaxButton != null %}
+                        {{ ajaxButton|raw }}
+                    {% endif %}
+                    {% block button_group_end %}
+                    {% endblock button_group_end %}
+                </span>
+                {% if deleteButton is defined and deleteButton != null %}
+                    {{ deleteButton|raw }}
+                {% endif %}
+            </h1>
+            <hr>
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <button type="submit" class="btn btn-primary">{{ button_label|default('Save') }}</button>
+            {{ form_end(form) }}
+            {% block after_create_form %}
+            {% endblock after_create_form %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,18 @@
+
+services:
+    rundum_symfony_helper_bundle.data_list_service:
+        class: Rundum\SymfonyHelperBundle\Service\DataListService
+        autowire: false
+        arguments:
+            - '@twig'
+            - '@form.factory'
+    
+    Rundum\SymfonyHelperBundle\Service\DataListService: '@rundum_symfony_helper_bundle.data_list_service'      
+    
+    rundum_symfony_helper_bundle.event_service:
+        class: Rundum\SymfonyHelperBundle\Service\EventService
+        autowire: false
+        arguments:
+            - '@event_dispatcher'
+            
+    Rundum\SymfonyHelperBundle\Service\EventService: '@rundum_symfony_helper_bundle.event_service'

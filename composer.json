@@ -1,0 +1,30 @@
+{
+    "name": "rundum/symfony-helper",
+    "description": "Some helpers for Symfony projects",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hendrik Pilz",
+            "email": "hepisec@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "symfony/http-kernel": "^5.3",
+        "rundum/event-base": "^0.2.0",
+        "symfony/framework-bundle": "^5.3",
+        "symfony/twig-bundle": "^5.3",
+        "symfony/translation": "^5.3",
+        "symfony/form": "^5.3",
+        "symfony/security-csrf": "^5.3",
+        "pagerfanta/doctrine-dbal-adapter": "^3.1",
+        "pagerfanta/twig": "^3.1",
+        "babdev/pagerfanta-bundle": "^3.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Rundum\\SymfonyHelperBundle\\": "src/"
+        }
+    }    
+}

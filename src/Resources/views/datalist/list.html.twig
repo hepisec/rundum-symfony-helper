@@ -1,0 +1,158 @@
+{% extends 'base.html.twig' %}
+
+{% if columns is not defined %}
+    {% set columns = 0 %}
+{% endif %}
+
+{% block body %}
+    <div class="container-fluid with-margin">
+        <h1 class="text-center">{{ title }}</h1>
+        {% block after_h1 %}
+        {% endblock %}
+        <div class="text-center">
+            <small>
+                (Gesamt: {{ pager|length == constant('PHP_INT_MAX') ? pager.currentPageResults|length : pager|length }})
+            </small>
+            <br>
+            <div class="btn-group" role="group">
+                <a href="{{ path(app.request.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all|merge({csv: 1}))) }}"
+                   class="btn btn-default"><i class="fas fa-download"></i> CSV</a>
+                {% block custom_buttons %}
+                    {% if create_route is defined %}
+                        <a class="btn btn-info" href="{{ path(create_route) }}"><i class="fas fa-plus"></i> {% trans %}create{% endtrans %}</a>
+                    {% endif %}
+                {% endblock %}
+            </div>
+        </div>
+        <div class="d-flex justify-content-center mt-2">
+            {{ pagerfanta(pager, 'twitter_bootstrap5', {'prev_message': 'zurück'|trans, 'next_message': 'weiter'|trans}) }}
+        </div>
+        <div class="row with-margin">
+            <div class="col-xs-12">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        {% set i = 0 %}
+                        {% for row in pager.currentPageResults %}
+                        {% if i == 0 %}
+                        <thead>
+                        <tr>
+                            {% block before_heading_columns %}
+                            {% endblock %}
+                            {% for heading in row|keys %}
+                                {% if heading|slice(0, 2) != '__' %}
+                                    {% if heading != "action" %}
+                                        {% set columns = columns + 1 %}
+                                        <th>
+                                            {{ heading }}
+                                            {% if sortEnabled %}
+                                                <p class="text-center float-end">
+                                                    <a href="{{ path(app.request.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all|merge({sort: heading, order: 'asc'}))) }}"><i
+                                                                class="fas fa-sort-up"></i></a>
+                                                    <a href="{{ path(app.request.get('_route'), app.request.attributes.get('_route_params')|merge(app.request.query.all|merge({sort: heading, order: 'desc'}))) }}"><i
+                                                                class="fas fa-sort-down"></i></a>
+                                                </p>
+                                            {% endif %}
+                                            {% if filterEnabled %}
+                                                <form method="GET"
+                                                      action="{{ path(app.request.get('_route'), app.request.attributes.get('_route_params')) }}"
+                                                      class="form-inline">
+                                                    <div class="input-group">
+                                                        {% set currentFilterValue = null %}
+                                                        {% for filter, value in appliedFilters %}
+                                                            {% if filter == heading %}
+                                                                {% set currentFilterValue = value %}
+                                                            {% else %}
+                                                                <input type="hidden" name="filter[]" value="{{ filter }}"/>
+                                                                <input type="hidden" name="value[]" value="{{ value }}"/>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                        {% if block('_custom_filter_query_params_' ~ heading) is defined %}
+                                                            {{ block('_custom_filter_query_params_' ~ heading) }}
+                                                        {% else %}
+                                                            {% for key, value in app.request.query %}
+                                                                {% if key != "filter" and key != "value" %}
+                                                                    {% if value is iterable %}
+                                                                        {% for val in value %}
+                                                                            <input type="hidden" name="{{ key }}[]" value="{{ val }}"/>
+                                                                        {% endfor %}
+                                                                    {% else %}
+                                                                        <input type="hidden" name="{{ key }}" value="{{ value }}"/>
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                        {% if block('_custom_filter_' ~ heading) is defined %}
+                                                            {{ block('_custom_filter_' ~ heading) }}
+                                                        {% else %}
+                                                            <input type="hidden" name="filter[]" value="{{ heading }}"/>
+                                                            <input type="text" name="value[]" placeholder="Filter"
+                                                                   class="form-control"
+                                                                    {% if currentFilterValue is not null %}
+                                                                        value="{{ currentFilterValue }}"
+                                                                    {% endif %}
+                                                            />
+                                                            <span class="input-group-btn">
+                                                                <button type="submit" class="btn btn-default "><i class="fas fa-filter"></i></button>
+                                                            </span>
+                                                        {% endif %}
+                                                    </div>
+                                                </form>
+                                            {% endif %}
+                                        </th>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                            {% if row.action is defined %}
+                                {% set columns = columns + 1 %}
+                                <th>&nbsp;</th>
+                            {% endif %}
+                            {% block after_heading_columns %}
+                            {% endblock %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% endif %}
+                        {% block entry_row_begin %}
+                        <tr>
+                            {% endblock %}
+                            {% block before_entry_columns %}
+                            {% endblock %}
+                            {% for key, value in row %}
+                                {% if block('_custom_cell_' ~ key) is defined %}
+                                    {{ block('_custom_cell_' ~ key) }}
+                                {% else %}
+                                    {% if key|slice(0,2) != '__' %}
+                                        {% if key != "action" %}
+                                            <td>{{ value }}</td>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                            {% if row.action is defined %}
+                                <td>
+                                    {% if row.action is not empty %}
+                                        <a href="{{ row.action }}"><i class="fas fa-edit"></i></a>
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+                            {% block after_entry_columns %}
+                            {% endblock %}
+                            {% block entry_row_end %}
+                        </tr>
+                        {% endblock %}
+                        {% set i = i + 1 %}
+                        {% endfor %}
+                        </tbody>
+                        {% block after_table_body %}
+                        {% endblock %}
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center">
+            {{ pagerfanta(pager, 'twitter_bootstrap5', {'prev_message': 'zurück'|trans, 'next_message': 'weiter'|trans}) }}
+        </div>
+    </div>
+    {% block after_body %}
+    {% endblock %}
+{% endblock %}

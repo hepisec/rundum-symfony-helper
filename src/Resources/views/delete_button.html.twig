@@ -1,0 +1,7 @@
+{{ form_start(form) }}
+<button class="btn btn-danger" id="{{ form.vars.id ~ '_remove' }}" name="{{ form.vars.id ~ '_remove' }}"
+        onclick="return confirm('Wirklich löschen?');" role="button">
+    <i class="fa fa-trash"></i>
+    Löschen
+</button>
+{{ form_end(form) }}
