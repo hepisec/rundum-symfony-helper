@@ -100,6 +100,9 @@ abstract class AbstractDataListController extends AbstractController {
      * @Route("", methods={"GET"}, name="list")
      */
     public function list(Request $request) {
+        $entity = (new \ReflectionClass($this->getEntityClass()))->newInstance();
+        $this->setPermissionForList($entity);
+
         $builder = $this->dataListService
                 ->builder($request)
                 ->setTitle($this->translator->trans($this->getEntityName() . '.datalist.title'))
@@ -294,6 +297,10 @@ abstract class AbstractDataListController extends AbstractController {
             'deleteButton' => $this->getDeleteButton($request, $entity),
             lcfirst($this->getShortName($this->getEntityClass())) => $entity
         ];
+    }
+
+    protected function setPermissionForList($entity) {
+        $this->denyAccessUnlessGranted('LIST', $entity);
     }
 
     protected function setPermissionForCreate($entity) {
